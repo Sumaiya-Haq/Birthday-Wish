@@ -1,14 +1,371 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎂</text></svg>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Happy Birthday! 🎂✨ | Magical Animated Wish</title>
-    <meta name="description" content="A magical, interactive animated birthday surprise filled with music, memory polaroids, candle blowing, and heartfelt wishes built with love." />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Happy Birthday Surprise! 🎂✨ | Personalized Cinematic Wish</title>
+  <meta name="description" content="A personalized cinematic birthday surprise website with interactive story flow, custom photo reveal, coding terminal magic, and celebratory confetti." />
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎁</text></svg>" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Fira+Code:wght@400;600&family=Outfit:wght@300;400;600;700;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Ambient Particle Canvas Background -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Confetti Canvas Overlay -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <!-- Main Container -->
+  <div id="app">
+    <!-- Top Navigation Bar & Audio / Control Buttons -->
+    <header class="top-nav">
+      <div class="nav-brand" id="nav-brand-btn">
+        <span class="brand-icon">✨</span>
+        <span class="brand-text">Birthday Surprise</span>
+      </div>
+
+      <!-- Step Indicator Dots -->
+      <div class="step-progress" id="step-progress">
+        <span class="step-dot active" data-step="1" title="Cinematic Intro"></span>
+        <span class="step-dot" data-step="2" title="Developer Terminal"></span>
+        <span class="step-dot" data-step="3" title="Birthday Reveal"></span>
+        <span class="step-dot" data-step="4" title="Wish Letter"></span>
+        <span class="step-dot" data-step="5" title="Sign-Off"></span>
+        <span class="step-dot" data-step="6" title="Finale Party"></span>
+      </div>
+
+      <div class="nav-controls">
+        <button id="music-toggle-btn" class="nav-btn" aria-label="Toggle Audio" title="Play / Mute Music">
+          <span class="btn-icon">🎵</span>
+          <span class="btn-text">Music</span>
+          <span class="sound-wave">
+            <span></span><span></span><span></span>
+          </span>
+        </button>
+
+        <button id="edit-modal-btn" class="nav-btn accent-btn" aria-label="Customize Surprise">
+          <span class="btn-icon">⚙️</span>
+          <span class="btn-text">Customize</span>
+        </button>
+
+        <button id="share-link-btn" class="nav-btn icon-only" aria-label="Copy Shareable Link" title="Copy Shareable Link">
+          <span class="btn-icon">🔗</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN SCENE CONTAINER -->
+    <main class="scene-stage">
+      
+      <!-- SCENE 1: Dark Cinematic Intro -->
+      <section id="scene-1" class="scene active">
+        <div class="cinematic-intro-card">
+          <div class="glow-orb"></div>
+          <div class="intro-text-wrapper">
+            <p class="intro-line line-1"><span class="emoji-bounce">🎂</span> No cake.</p>
+            <p class="intro-line line-2"><span class="emoji-bounce">🌹</span> No flowers.</p>
+            <p class="intro-line line-3 highlight"><span class="emoji-pulse">✨</span> Just a little surprise...</p>
+            <p class="intro-line line-4 sub-text">Built line by line, crafted with love, just for you.</p>
+          </div>
+
+          <div class="scene-actions">
+            <button class="btn btn-primary btn-glow next-scene-btn" data-next="2">
+              <span>Begin Experience</span>
+              <span class="arrow">→</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCENE 2: Developer Coding Terminal -->
+      <section id="scene-2" class="scene">
+        <div class="terminal-card">
+          <div class="terminal-header">
+            <div class="terminal-dots">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+            </div>
+            <div class="terminal-title">surprise_protocol.js — Visual Studio Code</div>
+            <div class="terminal-tag">JS</div>
+          </div>
+          
+          <div class="terminal-body">
+            <pre class="code-editor"><code id="code-content"></code></pre>
+
+            <div class="terminal-console">
+              <div class="console-header">> SYSTEM LOGS</div>
+              <div id="console-logs"></div>
+            </div>
+          </div>
+
+          <div class="scene-actions align-right">
+            <button class="btn btn-secondary next-scene-btn" data-next="1">← Back</button>
+            <button class="btn btn-primary btn-glow next-scene-btn" data-next="3" id="reveal-trigger-btn">
+              <span>REVEAL SURPRISE ✨</span>
+              <span class="arrow">→</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCENE 3: Birthday Reveal & Photo -->
+      <section id="scene-3" class="scene">
+        <div class="reveal-card">
+          <div class="sparkle-particles"></div>
+          
+          <div class="relationship-badge" id="display-badge">
+            To My Dearest Best Friend 💖
+          </div>
+
+          <h1 class="birthday-title">
+            Happy Birthday, <span id="display-bday-name" class="name-gradient">Alex</span>! <span class="heart-pulse">❤️</span>
+          </h1>
+
+          <!-- Animated Photo Frame -->
+          <div class="photo-frame-wrapper">
+            <div class="frame-aura"></div>
+            <div class="photo-frame">
+              <img id="display-photo" src="" alt="Birthday Person Photo" class="bday-photo" />
+              <div class="photo-overlay">
+                <span class="photo-heart">💖</span>
+              </div>
+            </div>
+            <div class="frame-sparkles">
+              <span>✨</span><span>🌟</span><span>💖</span><span>✨</span>
+            </div>
+          </div>
+
+          <p class="reveal-subtitle">Today is all about celebrating your magic!</p>
+
+          <div class="scene-actions">
+            <button class="btn btn-secondary next-scene-btn" data-next="2">← Back</button>
+            <button class="btn btn-primary btn-glow next-scene-btn" data-next="4">
+              <span>Open Birthday Letter 💌</span>
+              <span class="arrow">→</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCENE 4: Digital Birthday Letter -->
+      <section id="scene-4" class="scene">
+        <div class="letter-card-container">
+          <div class="envelope-ribbon"></div>
+          
+          <div class="letter-card">
+            <div class="card-corner top-left"></div>
+            <div class="card-corner bottom-right"></div>
+            
+            <div class="letter-header">
+              <div class="wax-seal">🎂</div>
+              <h2>A Special Message For You</h2>
+              <div class="date-stamp" id="letter-date">Today</div>
+            </div>
+
+            <div class="letter-body">
+              <div class="quote-mark start">“</div>
+              <p id="typed-message" class="typed-text"></p>
+              <div class="quote-mark end">”</div>
+            </div>
+
+            <div class="letter-footer">
+              <span class="type-cursor-status" id="type-status">Typing wish...</span>
+            </div>
+          </div>
+
+          <div class="scene-actions">
+            <button class="btn btn-secondary next-scene-btn" data-next="3">← Back</button>
+            <button class="btn btn-primary btn-glow next-scene-btn" data-next="5" id="letter-next-btn">
+              <span>See Who Sent This 🎁</span>
+              <span class="arrow">→</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCENE 5: Sender Sign-Off -->
+      <section id="scene-5" class="scene">
+        <div class="signoff-card">
+          <div class="heart-ring"></div>
+          
+          <div class="signoff-content">
+            <p class="signoff-label">With all my love & warmest wishes,</p>
+            <h2 id="display-sender-name" class="sender-signature">Sophia</h2>
+            <p class="signoff-rel-tag">Your <span id="display-relationship">Best Friend</span> Forever</p>
+
+            <div class="signature-line"></div>
+          </div>
+
+          <div class="scene-actions">
+            <button class="btn btn-secondary next-scene-btn" data-next="4">← Back</button>
+            <button class="btn btn-primary btn-glow btn-rainbow next-scene-btn" data-next="6" id="start-party-btn">
+              <span>Let's Celebrate! 🎉</span>
+              <span class="arrow">→</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCENE 6: Interactive Finale Party -->
+      <section id="scene-6" class="scene">
+        <div class="finale-card">
+          
+          <!-- Interactive Floating Elements Layers -->
+          <div id="floating-hearts-layer" class="floating-layer"></div>
+          <div id="floating-balloons-layer" class="floating-layer"></div>
+
+          <div class="finale-header">
+            <span class="badge-pill">🎂 IT'S PARTY TIME! 🎈</span>
+            <h1 class="finale-title">Wish Big & Celebrate! ✨</h1>
+            <p class="finale-hint">Tap the candles on the cake to blow them out!</p>
+          </div>
+
+          <!-- Interactive Cake Component -->
+          <div class="cake-container">
+            <div class="interactive-cake" id="cake-element" title="Click candles to blow them out!">
+              <div class="candle-group">
+                <div class="candle c1"><div class="flame"></div></div>
+                <div class="candle c2"><div class="flame"></div></div>
+                <div class="candle c3"><div class="flame"></div></div>
+              </div>
+              <div class="cake-top-layer">
+                <span class="frosting"></span>
+                <span class="frosting"></span>
+                <span class="frosting"></span>
+              </div>
+              <div class="cake-middle-layer">
+                <span class="berry">🍓</span>
+                <span class="berry">🍒</span>
+                <span class="berry">🍓</span>
+              </div>
+              <div class="cake-bottom-layer"></div>
+              <div class="cake-plate"></div>
+            </div>
+            <div id="cake-blown-status" class="cake-status">Candles are lit! Make a wish ✨</div>
+          </div>
+
+          <!-- Finale Control Actions -->
+          <div class="finale-actions">
+            <button id="replay-btn" class="btn btn-secondary">
+              <span>🔄 Replay Surprise</span>
+            </button>
+            
+            <button id="edit-from-finale-btn" class="btn btn-primary btn-glow">
+              <span>⚙️ Create New / Edit</span>
+            </button>
+
+            <button id="share-from-finale-btn" class="btn btn-accent">
+              <span>🔗 Share Link</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- CUSTOMIZATION MODAL -->
+    <div id="customizer-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <button id="close-modal-btn" class="modal-close-icon" aria-label="Close Modal">✕</button>
+        
+        <div class="modal-header">
+          <span class="modal-icon">⚙️</span>
+          <h2>Customize Birthday Surprise</h2>
+          <p>Personalize every detail of this surprise without writing code!</p>
+        </div>
+
+        <form id="customizer-form" class="customizer-form">
+          <!-- Birthday Person Name -->
+          <div class="form-group">
+            <label for="input-bday-name">Birthday Person's Name <span class="required">*</span></label>
+            <input type="text" id="input-bday-name" placeholder="e.g. Alex" required maxlength="30" />
+          </div>
+
+          <!-- Relationship -->
+          <div class="form-group">
+            <label for="input-relationship">Relationship <span class="required">*</span></label>
+            <select id="input-relationship">
+              <option value="Best Friend">Best Friend</option>
+              <option value="Partner">Partner / Lover</option>
+              <option value="Sister">Sister</option>
+              <option value="Brother">Brother</option>
+              <option value="Soulmate">Soulmate</option>
+              <option value="Mom">Mom</option>
+              <option value="Dad">Dad</option>
+              <option value="Special Someone">Special Someone</option>
+              <option value="Friend">Friend</option>
+            </select>
+          </div>
+
+          <!-- Photo Upload -->
+          <div class="form-group">
+            <label>Upload Birthday Person's Photo</label>
+            <div class="photo-upload-zone" id="upload-dropzone">
+              <input type="file" id="input-photo" accept="image/*" class="file-input-hidden" />
+              <div class="upload-content">
+                <div class="upload-preview-circle" id="upload-preview-container">
+                  <span id="upload-placeholder-icon">📸</span>
+                  <img id="upload-preview-img" class="hidden" alt="Preview" />
+                </div>
+                <div class="upload-text">
+                  <span class="upload-btn-text">Click or Drag & Drop Photo</span>
+                  <span class="upload-subtext">JPG, PNG, GIF or WebP up to 5MB</span>
+                </div>
+              </div>
+            </div>
+            <div class="photo-actions hidden" id="photo-actions-bar">
+              <button type="button" id="remove-photo-btn" class="btn-text-danger">🗑️ Clear Photo</button>
+            </div>
+          </div>
+
+          <!-- Birthday Message -->
+          <div class="form-group">
+            <div class="label-with-presets">
+              <label for="input-wish-message">Custom Birthday Wish / Message <span class="required">*</span></label>
+              <div class="preset-pills">
+                <button type="button" class="preset-pill-btn" data-preset="heartfelt">✨ Heartfelt</button>
+                <button type="button" class="preset-pill-btn" data-preset="funny">😄 Fun</button>
+                <button type="button" class="preset-pill-btn" data-preset="sweet">💖 Sweet</button>
+              </div>
+            </div>
+            <textarea id="input-wish-message" rows="4" placeholder="Write your heartfelt message here..." required maxlength="500"></textarea>
+            <div class="char-counter"><span id="char-count">0</span> / 500</div>
+          </div>
+
+          <!-- Sender Name -->
+          <div class="form-group">
+            <label for="input-sender-name">Your Name (Sender) <span class="required">*</span></label>
+            <input type="text" id="input-sender-name" placeholder="e.g. Sophia" required maxlength="30" />
+          </div>
+
+          <!-- Form Actions -->
+          <div class="modal-actions">
+            <button type="button" id="demo-preset-btn" class="btn btn-secondary">
+              ⚡ Fill Demo Data
+            </button>
+            
+            <button type="submit" class="btn btn-primary btn-glow">
+              🚀 Create Surprise
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
 </html>
