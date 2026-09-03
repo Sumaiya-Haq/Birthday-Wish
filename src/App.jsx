@@ -1,155 +1,106 @@
-import React, { useState, useEffect, useRef } from 'react';
-import ParticleCanvas from './components/ParticleCanvas';
-import EnvelopeModal from './components/EnvelopeModal';
-import HeroHeader from './components/HeroHeader';
-import InteractiveCake from './components/InteractiveCake';
-import PhotoGallery from './components/PhotoGallery';
-import PictureNotesDeck from './components/PictureNotesDeck';
-import WishLetter from './components/WishLetter';
-import CustomizerModal from './components/CustomizerModal';
-import { DEFAULT_BIRTHDAY_DATA } from './utils/defaultData';
-import { Heart, Sparkles } from 'lucide-react';
+import React, { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import Confetti from './components/Confetti';
+import SetupScreen from './components/SetupScreen';
+import IntroScene from './components/IntroScene';
+import BirthdayCard from './components/BirthdayCard';
+import EnvelopeLetter from './components/EnvelopeLetter';
+import FinalScene from './components/FinalScene';
 
+// phases: setup -> intro -> card -> letter -> final
 export default function App() {
-  const [isEnvelopeOpen, setIsEnvelopeOpen] = useState(false);
-  const [isCustomizerOpen, setIsCustomizerOpen] = useState(false);
-  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [phase, setPhase] = useState('setup');
+  const [data, setData] = useState(null);
 
-  // Load state from LocalStorage or fall back to DEFAULT_BIRTHDAY_DATA
-  const [birthdayData, setBirthdayData] = useState(() => {
-    try {
-      const saved = localStorage.getItem('birthday_wish_data');
-      return saved ? JSON.parse(saved) : DEFAULT_BIRTHDAY_DATA;
-    } catch (e) {
-      return DEFAULT_BIRTHDAY_DATA;
-    }
-  });
-
-  const audioRef = useRef(null);
-
-  useEffect(() => {
-    // Create audio instance
-    const audio = new Audio(birthdayData.audioTrackUrl || DEFAULT_BIRTHDAY_DATA.audioTrackUrl);
-    audio.loop = true;
-    audio.volume = 0.4;
-    audioRef.current = audio;
-
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-    };
-  }, [birthdayData.audioTrackUrl]);
-
-  const handleToggleAudio = () => {
-    if (!audioRef.current) return;
-    if (isPlayingAudio) {
-      audioRef.current.pause();
-      setIsPlayingAudio(false);
-    } else {
-      audioRef.current
-        .play()
-        .then(() => setIsPlayingAudio(true))
-        .catch((err) => console.log('Audio autoplay error:', err));
-    }
+  const handleCreate = (formData) => {
+    setData(formData);
+    setPhase('intro');
   };
 
-  const handleOpenEnvelope = () => {
-    setIsEnvelopeOpen(true);
-    // Start background music automatically on unseal if browser permits
-    if (audioRef.current && !isPlayingAudio) {
-      audioRef.current
-        .play()
-        .then(() => setIsPlayingAudio(true))
-        .catch((e) => console.log('Autoplay prevented:', e));
-    }
+  const handleRestart = () => {
+    setPhase('setup');
+    setData(null);
   };
 
-  const handleSaveCustomData = (newData) => {
-    setBirthdayData(newData);
-    try {
-      localStorage.setItem('birthday_wish_data', JSON.stringify(newData));
-    } catch (e) {
-      console.log('Error saving to localStorage:', e);
-    }
-  };
-
-  const handleResetDefaults = () => {
-    setBirthdayData(DEFAULT_BIRTHDAY_DATA);
-    try {
-      localStorage.removeItem('birthday_wish_data');
-    } catch (e) {
-      console.log('Error clearing localStorage:', e);
-    }
-  };
-
-  const scrollToSection = (id) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  // Confetti only appears once we're past the intro (around the card onward).
+  const showConfetti = phase === 'card' || phase === 'letter';
 
   return (
-    <div className="min-h-screen relative text-white selection:bg-rose-500 selection:text-white">
-      {/* Floating Canvas Particles */}
-      <ParticleCanvas />
+    <div className="stage">
+      {showConfetti && <Confetti />}
 
-      {/* Opening Envelope Experience */}
-      {!isEnvelopeOpen && (
-        <EnvelopeModal
-          recipientName={birthdayData.recipientName}
-          onOpen={handleOpenEnvelope}
-        />
-      )}
+      <div className="portrait">
+        <AnimatePresence mode="wait">
+          {phase === 'setup' && (
+            <motion.div
+              key="setup"
+              style={{ width: '100%', height: '100%' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <SetupScreen onCreate={handleCreate} />
+            </motion.div>
+          )}
 
-      {/* Main Experience Content */}
-      <main className={`transition-opacity duration-1000 ${isEnvelopeOpen ? 'opacity-100' : 'opacity-20 pointer-events-none'}`}>
-        <HeroHeader
-          recipientName={birthdayData.recipientName}
-          subtitle={birthdayData.subtitle}
-          isPlayingAudio={isPlayingAudio}
-          onToggleAudio={handleToggleAudio}
-          onOpenCustomizer={() => setIsCustomizerOpen(true)}
-          onScrollToCake={() => scrollToSection('cake-section')}
-          onScrollToLetter={() => scrollToSection('letter-section')}
-        />
+          {phase === 'intro' && (
+            <motion.div
+              key="intro"
+              style={{ width: '100%', height: '100%' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <IntroScene onReveal={() => setPhase('card')} />
+            </motion.div>
+          )}
 
-        <InteractiveCake recipientName={birthdayData.recipientName} />
+          {phase === 'card' && (
+            <motion.div
+              key="card"
+              style={{ width: '100%', height: '100%' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <BirthdayCard
+                data={data}
+                onClickHere={() => setPhase('letter')}
+                onFromLove={() => setPhase('letter')}
+              />
+            </motion.div>
+          )}
 
-        <PhotoGallery
-          photos={birthdayData.photos}
-          recipientName={birthdayData.recipientName}
-        />
+          {phase === 'letter' && (
+            <motion.div
+              key="letter"
+              style={{ width: '100%', height: '100%' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <EnvelopeLetter data={data} onFinish={() => setPhase('final')} />
+            </motion.div>
+          )}
 
-        <PictureNotesDeck pictureNotes={birthdayData.pictureNotes} />
-
-        <WishLetter
-          title={birthdayData.letterTitle}
-          body={birthdayData.letterBody}
-          recipientName={birthdayData.recipientName}
-          senderName={birthdayData.senderName}
-        />
-      </main>
-
-      {/* Footer */}
-      <footer className="py-10 text-center text-rose-200/60 text-xs relative z-10 border-t border-white/5 mt-16">
-        <div className="flex items-center justify-center gap-1.5 font-medium mb-1">
-          <span>Created with</span>
-          <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 animate-pulse" />
-          <span>for {birthdayData.recipientName}</span>
-        </div>
-        <p className="text-white/40">Code carrying love & unforgettable memories • Happy Birthday ✨</p>
-      </footer>
-
-      {/* Customizer Drawer */}
-      <CustomizerModal
-        isOpen={isCustomizerOpen}
-        onClose={() => setIsCustomizerOpen(false)}
-        currentData={birthdayData}
-        onSave={handleSaveCustomData}
-        onReset={handleResetDefaults}
-      />
+          {phase === 'final' && (
+            <motion.div
+              key="final"
+              style={{ width: '100%', height: '100%' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <FinalScene onRestart={handleRestart} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
