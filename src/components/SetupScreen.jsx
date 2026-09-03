@@ -4,6 +4,7 @@ export default function SetupScreen({ onCreate }) {
   const [name, setName] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
   const [date, setDate] = useState('');
+  const [gender, setGender] = useState('boy');
   const [message, setMessage] = useState('');
   const [sender, setSender] = useState('');
   const fileRef = useRef(null);
@@ -18,13 +19,21 @@ export default function SetupScreen({ onCreate }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const finalMessage =
+      message.trim() ||
+      "Another year of you lighting up every room you walk into.\nHere's to more laughter, more dreams, and more of everything you love.";
+    // Each non-empty line becomes its own flip card in the letter deck.
+    const cards = finalMessage
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean);
     onCreate({
       name: name.trim() || 'You',
       photoUrl,
       date,
-      message:
-        message.trim() ||
-        "Another year of you lighting up every room you walk into. Here's to more laughter, more dreams, and more of everything you love.",
+      gender,
+      message: finalMessage,
+      cards: cards.length ? cards : [finalMessage],
       sender: sender.trim() || 'Me',
     });
   };
@@ -77,14 +86,35 @@ export default function SetupScreen({ onCreate }) {
       </div>
 
       <div className="field">
+        <label>Who is this for?</label>
+        <div className="gender-row">
+          <button
+            type="button"
+            className={`gender-opt${gender === 'boy' ? ' active' : ''}`}
+            onClick={() => setGender('boy')}
+          >
+            🎩 Boy
+          </button>
+          <button
+            type="button"
+            className={`gender-opt${gender === 'girl' ? ' active' : ''}`}
+            onClick={() => setGender('girl')}
+          >
+            🎀 Girl
+          </button>
+        </div>
+      </div>
+
+      <div className="field">
         <label htmlFor="message">Birthday message</label>
         <textarea
           id="message"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Write something from the heart..."
+          placeholder="Write something from the heart... (each new line becomes its own card)"
           maxLength={500}
         />
+        <small className="hint">Tip: press Enter between lines to create multiple flip cards.</small>
       </div>
 
       <div className="field">

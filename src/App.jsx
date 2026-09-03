@@ -53,7 +53,7 @@ export default function App() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <IntroScene onReveal={() => setPhase('card')} />
+              <IntroScene data={data} onReveal={() => setPhase('card')} />
             </motion.div>
           )}
 

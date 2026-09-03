@@ -1,15 +1,16 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const LINES = [
-  'No cake. 🎂',
-  'No flowers. 🌹',
-  'Just a developer who',
-  'stayed up all night...',
-  'for her. 🤍',
-];
+export default function IntroScene({ onReveal, data }) {
+  const pronoun = data?.gender === 'girl' ? 'her' : 'him';
+  const LINES = [
+    'No cake. 🎂',
+    'No flowers. 🌹',
+    'Just a developer who',
+    'stayed up all night...',
+    `for ${pronoun}. 🤍`,
+  ];
 
-export default function IntroScene({ onReveal }) {
   return (
     <div className="intro">
       <div className="intro-lines">

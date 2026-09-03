@@ -4,7 +4,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function EnvelopeLetter({ data, onFinish }) {
   // stages: 'closed' -> 'open' (flap up + letter rises) -> 'letter'
   const [stage, setStage] = useState('closed');
+  const [index, setIndex] = useState(0);
   const [typed, setTyped] = useState('');
+
+  const cards = data.cards && data.cards.length ? data.cards : [data.message];
+  const isLast = index === cards.length - 1;
 
   // Auto-open sequence.
   useEffect(() => {
@@ -16,19 +20,19 @@ export default function EnvelopeLetter({ data, onFinish }) {
     };
   }, []);
 
-  // Typewriter for the custom message once the letter is visible.
+  // Typewriter for the current card once the letter is visible.
   useEffect(() => {
     if (stage !== 'letter') return;
     setTyped('');
     let i = 0;
-    const msg = data.message;
+    const msg = cards[index];
     const id = setInterval(() => {
       i += 1;
       setTyped(msg.slice(0, i));
       if (i >= msg.length) clearInterval(id);
     }, 28);
     return () => clearInterval(id);
-  }, [stage, data.message]);
+  }, [stage, index, cards]);
 
   return (
     <div className="envelope-scene">
@@ -59,24 +63,46 @@ export default function EnvelopeLetter({ data, onFinish }) {
             </motion.div>
           </motion.div>
         ) : (
-          <motion.div
-            key="letter"
-            className="letter"
-            initial={{ opacity: 0, y: 40, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
-          >
-            <h3>Dear {data.name},</h3>
-            <p>{typed}</p>
-            <div className="sign">
-              With love,
-              <br />
-              {data.sender} ❤️
-            </div>
-            <button className="close-hint" onClick={onFinish}>
-              Close 🤍
-            </button>
-          </motion.div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`card-${index}`}
+              className="letter"
+              initial={{ opacity: 0, y: 40, scale: 0.92, rotate: -1 }}
+              animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
+              exit={{ opacity: 0, y: -30, scale: 0.92, transition: { duration: 0.3 } }}
+              transition={{ duration: 0.55, ease: 'easeOut' }}
+            >
+              {index === 0 && <h3>Dear {data.name},</h3>}
+              <p>{typed}</p>
+
+              {isLast && (
+                <div className="sign">
+                  With love,
+                  <br />
+                  {data.sender} ❤️
+                </div>
+              )}
+
+              <div className="card-progress">
+                {cards.map((_, i) => (
+                  <span key={i} className={`dot${i === index ? ' on' : ''}`} />
+                ))}
+              </div>
+
+              {isLast ? (
+                <button className="close-hint" onClick={onFinish}>
+                  Close 🤍
+                </button>
+              ) : (
+                <button
+                  className="close-hint next"
+                  onClick={() => setIndex((n) => n + 1)}
+                >
+                  Next card →
+                </button>
+              )}
+            </motion.div>
+          </AnimatePresence>
         )}
       </AnimatePresence>
     </div>

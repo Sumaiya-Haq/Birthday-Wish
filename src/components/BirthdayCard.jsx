@@ -29,16 +29,21 @@ export default function BirthdayCard({ data, onClickHere, onFromLove }) {
 
       {prettyDate && <div className="date-pill">{prettyDate}</div>}
 
-      <div className="photo-frame">
-        <span className="frame-deco tl">🎈</span>
-        <span className="frame-deco tr">✨</span>
-        <span className="frame-deco bl">🎀</span>
-        <span className="frame-deco br">🎉</span>
-        {data.photoUrl ? (
-          <img src={data.photoUrl || "/placeholder.svg"} alt={`${data.name}`} />
-        ) : (
-          <div className="no-photo">🎂</div>
-        )}
+      <div className="photo-wrap">
+        <div className="party-hat" aria-hidden="true">
+          <span className="hat-pom" />
+        </div>
+        <div className="photo-frame">
+          <span className="frame-deco tl">🎈</span>
+          <span className="frame-deco tr">✨</span>
+          <span className="frame-deco bl">🎀</span>
+          <span className="frame-deco br">🎉</span>
+          {data.photoUrl ? (
+            <img src={data.photoUrl || "/placeholder.svg"} alt={`${data.name}`} />
+          ) : (
+            <div className="no-photo">🎂</div>
+          )}
+        </div>
       </div>
 
       <div className="name-pill">Dear {data.name}</div>
