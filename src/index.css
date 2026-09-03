@@ -368,16 +368,16 @@ body {
 
 .party-hat {
   position: absolute;
-  top: -34px;
-  left: 50%;
-  transform: translateX(-50%) rotate(8deg);
-  width: 58px;
-  height: 68px;
+  top: -22px;
+  left: 38%;
+  transform: translateX(-50%) rotate(-14deg);
+  width: 50px;
+  height: 60px;
   background:
     repeating-linear-gradient(
       -55deg,
-      var(--bright-pink) 0 10px,
-      #fff 10px 20px
+      var(--bright-pink) 0 9px,
+      #fff 9px 18px
     );
   clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
   border-bottom: 3px solid var(--outline);
